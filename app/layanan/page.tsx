@@ -28,7 +28,14 @@ export default function Layanan() {
   const [jenisKerjasama, setJenisKerjasama] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
-  const layananList = [
+  const layananList: Array<{
+    icon: string
+    title: string
+    description: string
+    color: string
+    action?: () => void
+    link?: string
+  }> = [
     {
       icon: '📝',
       title: 'Aspirasi Mahasiswa',
@@ -180,7 +187,7 @@ export default function Layanan() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => !submitted && setShowForm(false)}
+              onClick={() => !submitted && setShowForm(null)}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
             />
 
@@ -205,7 +212,7 @@ export default function Layanan() {
                     </div>
                     {!submitted && (
                       <button
-                        onClick={() => setShowForm(false)}
+                        onClick={() => setShowForm(null)}
                         className="p-2 hover:bg-white/20 rounded-lg transition-colors"
                       >
                         <span className="text-white text-2xl">✕</span>
