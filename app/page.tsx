@@ -22,7 +22,7 @@ export default function Home() {
       step++
       setStats({
         mahasiswa: Math.floor((1200 / steps) * step),
-        kegiatan: Math.floor((50 / steps) * step),
+        kegiatan: Math.floor((30 / steps) * step),
         kementerian: Math.floor((8 / steps) * step),
       })
       if (step >= steps) clearInterval(timer)
