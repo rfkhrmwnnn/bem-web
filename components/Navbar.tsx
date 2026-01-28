@@ -14,8 +14,20 @@ const links = [
   { href: '/login', label: 'Admin', icon: '🔐' },
 ]
 
+const ormawaLinks = [
+  { href: '/ormawa/himsi', label: 'HIMSI', icon: '💻', color: 'from-blue-500 to-cyan-500' },
+  { href: '/ormawa/himatif', label: 'HIMATIF', icon: '⚡', color: 'from-green-500 to-teal-500' },
+  { href: '/ormawa/himareka', label: 'HIMAREKA', icon: '⚙️', color: 'from-orange-500 to-red-500' },
+  { href: '/ormawa/adcom', label: 'ADCOM', icon: '📢', color: 'from-purple-500 to-pink-500' },
+  { href: '/ormawa/icrt', label: 'ICRT', icon: '🛡️', color: 'from-blue-700 to-blue-500' },
+  { href: '/ormawa/futsal', label: 'Futsal', icon: '⚽', color: 'from-yellow-500 to-amber-500' },
+  { href: '/ormawa/gematika', label: 'Gematika', icon: '🏔️', color: 'from-green-700 to-emerald-500' },
+  { href: '/ormawa/senaya', label: 'Senaya', icon: '🎨', color: 'from-red-800 to-yellow-600' },
+]
+
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [ormawaOpen, setOrmawaOpen] = useState(false)
 
   return (
     <>
@@ -61,6 +73,57 @@ export default function Navbar() {
                 </Link>
               </li>
             ))}
+            
+            {/* Ormawa Dropdown */}
+            <li 
+              className="relative"
+              onMouseEnter={() => setOrmawaOpen(true)}
+              onMouseLeave={() => setOrmawaOpen(false)}
+            >
+              <button
+                className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-orangeBright dark:hover:text-neon hover:bg-gray-100 dark:hover:bg-gray-800 transition-all font-medium group flex items-center gap-1"
+              >
+                <span className="mr-1 group-hover:scale-110 inline-block transition-transform">🎓</span>
+                Ormawa
+                <motion.span
+                  animate={{ rotate: ormawaOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-xs"
+                >
+                  ▼
+                </motion.span>
+              </button>
+              
+              <AnimatePresence>
+                {ormawaOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full left-0 mt-2 w-64 glass border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl overflow-hidden"
+                  >
+                    <div className="p-2">
+                      {ormawaLinks.map((org) => (
+                        <Link
+                          key={org.href}
+                          href={org.href}
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:text-white transition-all font-medium group"
+                          style={{
+                            // @ts-ignore
+                            '--tw-gradient-from': org.color.split(' ')[0],
+                            '--tw-gradient-to': org.color.split(' ')[1],
+                          }}
+                        >
+                          <span className="text-xl group-hover:scale-110 transition-transform">{org.icon}</span>
+                          <span>{org.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </li>
           </ul>
 
           {/* Mobile Menu Button */}
@@ -147,6 +210,55 @@ export default function Navbar() {
                     </Link>
                   </motion.li>
                 ))}
+                
+                {/* Mobile Ormawa Section */}
+                <motion.li
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: links.length * 0.05 }}
+                >
+                  <button
+                    onClick={() => setOrmawaOpen(!ormawaOpen)}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all font-medium group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl group-hover:scale-110 transition-transform">🎓</span>
+                      <span>Ormawa</span>
+                    </div>
+                    <motion.span
+                      animate={{ rotate: ormawaOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-xs"
+                    >
+                      ▼
+                    </motion.span>
+                  </button>
+                  
+                  <AnimatePresence>
+                    {ormawaOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden mt-2 ml-4 space-y-1"
+                      >
+                        {ormawaLinks.map((org, idx) => (
+                          <Link
+                            key={org.href}
+                            href={org.href}
+                            onClick={() => setOpen(false)}
+                            className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:text-white transition-all font-medium bg-gradient-to-r ${org.color}`}
+                            style={{ backgroundClip: 'text', WebkitBackgroundClip: 'text', color: 'transparent' }}
+                          >
+                            <span className="text-lg">{org.icon}</span>
+                            <span style={{ color: 'inherit' }}>{org.label}</span>
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.li>
               </ul>
 
               {/* Mobile Menu Footer */}
