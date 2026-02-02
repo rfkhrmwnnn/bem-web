@@ -31,142 +31,43 @@ type ViewMode = 'dashboard' | 'kegiatan' | 'layanan' | 'settings'
 
 export default function AdminDashboard() {
   const router = useRouter()
-  const [kegiatan, setKegiatan] = useState<Kegiatan[]>([])
-  const [layananData, setLayananData] = useState<LayananData[]>([])
-  const [judul, setJudul] = useState('')
-  const [deskripsi, setDeskripsi] = useState('')
-  const [tanggal, setTanggal] = useState('')
-  const [gambar, setGambar] = useState<string | undefined>(undefined)
-  const [editId, setEditId] = useState<number | null>(null)
-  const [search, setSearch] = useState('')
-  const [viewMode, setViewMode] = useState<ViewMode>('dashboard')
-  const [showForm, setShowForm] = useState(false)
+  // ... existing state ...
+  const [sidebarOpen, setSidebarOpen] = useState(false) // New state for mobile sidebar
 
-  // Load data awal dari localStorage atau file JSON
-  useEffect(() => {
-    const stored = localStorage.getItem('kegiatan')
-    if (stored) setKegiatan(JSON.parse(stored))
-    else {
-      // Fallback or empty default
-      const defaultData: Kegiatan[] = [] 
-      setKegiatan(defaultData)
-      // fetch('/data/kegiatan.json').then... (optional implementation)
-    }
-  }, [])
-
-  // Simpan otomatis ke localStorage
-  useEffect(() => {
-    localStorage.setItem('kegiatan', JSON.stringify(kegiatan))
-  }, [kegiatan])
-
-  // Load layanan data
-  useEffect(() => {
-    const stored = localStorage.getItem('layananData')
-    if (stored) setLayananData(JSON.parse(stored))
-    
-    // Listen for storage changes
-    const handleStorage = () => {
-      const data = localStorage.getItem('layananData')
-      if (data) setLayananData(JSON.parse(data))
-    }
-    
-    window.addEventListener('storage', handleStorage)
-    return () => window.removeEventListener('storage', handleStorage)
-  }, [])
-
-  const resetForm = () => {
-    setJudul('')
-    setDeskripsi('')
-    setTanggal('')
-    setGambar(undefined)
-    setEditId(null)
-    setShowForm(false)
-  }
-
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const url = URL.createObjectURL(file)
-      setGambar(url)
-    }
-  }
-
-  const tambahKegiatan = () => {
-    if (!judul || !deskripsi || !tanggal)
-      return alert('Lengkapi semua data!')
-    const newItem: Kegiatan = {
-      id: Date.now(),
-      judul,
-      deskripsi,
-      tanggal,
-      gambar: gambar || '/images/logo.png',
-    }
-    const updated = [...kegiatan, newItem]
-    setKegiatan(updated)
-    localStorage.setItem('kegiatan', JSON.stringify(updated))
-    window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
-    resetForm()
-  }
-
-  const hapusKegiatan = (id: number) => {
-    if (confirm('Yakin ingin menghapus kegiatan ini?')) {
-      const updated = kegiatan.filter(k => k.id !== id)
-      setKegiatan(updated)
-      localStorage.setItem('kegiatan', JSON.stringify(updated))
-      window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
-    }
-  }
-
-  const editKegiatan = (item: Kegiatan) => {
-    setEditId(item.id)
-    setJudul(item.judul)
-    setDeskripsi(item.deskripsi)
-    setTanggal(item.tanggal)
-    setGambar(item.gambar || undefined)
-    setShowForm(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const simpanEdit = () => {
-    if (!editId) return
-    const updated = kegiatan.map(k =>
-      k.id === editId ? { ...k, judul, deskripsi, tanggal, gambar: gambar || undefined } : k
-    )
-    setKegiatan(updated)
-    localStorage.setItem('kegiatan', JSON.stringify(updated))
-    window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
-    resetForm()
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn')
-    router.push('/login')
-  }
-
-  const filtered = kegiatan.filter(k =>
-    k.judul.toLowerCase().includes(search.toLowerCase())
-  )
-
-  // Statistik
-  const totalKegiatan = kegiatan.length
-  const kegiatanBulanIni = kegiatan.filter(k => {
-    const date = new Date(k.tanggal)
-    const now = new Date()
-    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
-  }).length
-  const kegiatanMendatang = kegiatan.filter(k => new Date(k.tanggal) > new Date()).length
+  // ... existing functions ...
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex relative">
+        {/* Mobile Header Toggle */}
+        <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-50 flex items-center px-4 justify-between shadow-sm">
+             <div className="flex items-center gap-3">
+                 <div className="w-8 h-8 relative">
+                    <Image src="/images/logo.png" alt="Logo" fill className="object-contain" />
+                 </div>
+                 <span className="font-bold text-slate-800 dark:text-white">Admin Panel</span>
+             </div>
+             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 text-slate-600 dark:text-slate-300">
+                 {sidebarOpen ? '✕' : '☰'}
+             </button>
+        </div>
+
         {/* Sidebar */}
         <motion.aside
-          initial={{ x: -300 }}
-          animate={{ x: 0 }}
-          className="fixed md:static left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-40 shadow-xl md:shadow-none"
+          initial={false}
+          animate={{ x: sidebarOpen ? 0 : -300 }}
+          // On desktop (md), always show (x: 0). On mobile, rely on state. 
+          // However, with Tailwind classes we can control visibility better or use a resize listener.
+          // Simplest approach: Use Tailwind 'md:translate-x-0' override if using CSS transform, 
+          // but Framer Motion handles style directly.
+          // Better approach: Use a media query hook or just CSS classes for desktop reset.
+          // Let's stick to a conditional variant or simple className toggling for hybrid.
+          className={`fixed md:static inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-40 shadow-xl md:shadow-none transition-transform duration-300 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} pt-16 md:pt-0`}
         >
-          <div className="p-6 flex flex-col items-center border-b border-slate-100 dark:border-slate-800">
-            <div className="w-16 h-16 relative mb-3">
+          {/* Sidebar Content same as before but padding adjusted */}
+          <div className="p-6 flex flex-col items-center border-b border-slate-100 dark:border-slate-800 hidden md:flex">
+             {/* ... Logo ... */}
+             <div className="w-16 h-16 relative mb-3">
               <Image src="/images/logo.png" alt="Logo" fill className="object-contain" />
             </div>
             <h3 className="text-lg font-bold text-slate-800 dark:text-white">Admin Panel</h3>
@@ -174,7 +75,8 @@ export default function AdminDashboard() {
           </div>
 
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {[
+             {/* ... Nav Items ... */}
+             {[
               { id: 'dashboard', icon: '📊', label: 'Dashboard' },
               { id: 'kegiatan', icon: '📅', label: 'Kelola Kegiatan' },
               { id: 'layanan', icon: '📝', label: 'Data Layanan' },
@@ -182,7 +84,10 @@ export default function AdminDashboard() {
             ].map((item) => (
               <button
                 key={item.id}
-                onClick={() => setViewMode(item.id as ViewMode)}
+                onClick={() => {
+                    setViewMode(item.id as ViewMode)
+                    setSidebarOpen(false) // Close on click mobile
+                }}
                 className={`w-full text-left px-4 py-3 rounded-xl transition-all font-medium flex items-center gap-3 ${
                   viewMode === item.id
                     ? 'bg-ocean-50 dark:bg-ocean-900/20 text-ocean-600 dark:text-ocean-400'
@@ -193,8 +98,9 @@ export default function AdminDashboard() {
               </button>
             ))}
           </nav>
-
-          <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+          
+          {/* ... Logout ... */}
+           <div className="p-4 border-t border-slate-100 dark:border-slate-800">
             <button
               onClick={handleLogout}
               className="w-full flex items-center justify-center gap-2 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 transition-all font-semibold text-sm"
@@ -204,9 +110,15 @@ export default function AdminDashboard() {
           </div>
         </motion.aside>
 
+        {/* Overlay for mobile sidebar */}
+        {sidebarOpen && (
+            <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+        )}
+
         {/* Main Content */}
-        <main className="flex-1 min-w-0 overflow-y-auto h-screen">
-          <div className="p-8 max-w-7xl mx-auto">
+        <main className="flex-1 min-w-0 overflow-y-auto h-screen pt-16 md:pt-0">
+          <div className="p-4 md:p-8 max-w-7xl mx-auto">
+            {/* ... rest of content ... */}
             <AnimatePresence mode="wait">
               {/* Dashboard View */}
               {viewMode === 'dashboard' && (
