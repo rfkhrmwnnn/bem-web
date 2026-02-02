@@ -4,132 +4,113 @@ import { motion } from 'framer-motion'
 
 export default function DpmPage() {
   return (
-    <div className="min-h-screen pt-24 pb-16 px-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen pt-28 pb-20 px-4 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+            style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '40px 40px' }}>
+        </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header Section */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.8 }}
+          className="text-center mb-20"
         >
-          <div className="flex justify-center mb-8">
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              transition={{ duration: 0.3 }}
-              className="w-48 h-48 relative rounded-2xl shadow-2xl overflow-hidden border-4 border-gradient-to-r from-amber-500 to-yellow-500"
-            >
+          <div className="w-40 h-40 mx-auto relative mb-8 drop-shadow-2xl">
               <Image
                 src="/images/logo-dpm.png"
                 alt="Logo DPM"
                 fill
-                className="object-contain p-4"
+                className="object-contain"
               />
-            </motion.div>
           </div>
           
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight text-slate-800 dark:text-slate-100">
             DPM
           </h1>
-          <p className="text-2xl text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-xl md:text-2xl font-medium text-amber-600 dark:text-amber-500 mb-2 uppercase tracking-wide">
             Dewan Perwakilan Mahasiswa
           </p>
-          <p className="text-lg text-gray-500 dark:text-gray-500 italic">
+          <div className="w-24 h-1 bg-gradient-to-r from-amber-600 to-yellow-500 mx-auto rounded-full mb-6"></div>
+          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed font-light">
             Legislative, Aspiration & Supervision
           </p>
         </motion.div>
 
-        {/* Vision Section */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-12 glass p-8 rounded-2xl border border-amber-500/30 shadow-xl"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 flex items-center justify-center">
-              <span className="text-2xl">🏛️</span>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Visi</h2>
-          </div>
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed pl-4 md:pl-16">
-            Mewujudkan DPM IKMI sebagai lembaga legislatif yang aspiratif, profesional, dan berintegritas 
-            dalam memperjuangkan hak-hak mahasiswa serta bersinergi demi kemajuan kampus STMIK IKMI Cirebon.
-          </p>
-        </motion.div>
+        {/* Content Grid */}
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* Vision */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 relative overflow-hidden group hover:border-amber-500/30 transition-all"
+            >
+                <div className="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+                <div className="flex items-center gap-4 mb-6">
+                    <span className="text-4xl p-3 bg-amber-50 dark:bg-amber-900/20 rounded-2xl">🏛️</span>
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Visi Organisasi</h2>
+                </div>
+                <p className="text-slate-600 dark:text-slate-300 leading-loose text-lg">
+                    Mewujudkan DPM IKMI sebagai lembaga legislatif yang <span className="font-semibold text-amber-600">aspiratif</span>, <span className="font-semibold text-amber-600">profesional</span>, dan <span className="font-semibold text-amber-600">berintegritas</span> dalam memperjuangkan hak-hak mahasiswa serta bersinergi demi kemajuan kampus STMIK IKMI Cirebon.
+                </p>
+            </motion.div>
 
-        {/* Mission Section */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mb-12 glass p-8 rounded-2xl border border-yellow-500/30 shadow-xl"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 flex items-center justify-center">
-              <span className="text-2xl">📜</span>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Misi</h2>
-          </div>
-          <ul className="space-y-4 pl-4 md:pl-16">
-            <li className="flex gap-3 text-lg text-gray-700 dark:text-gray-300">
-              <span className="text-amber-500 font-bold">1.</span>
-              <span>Menampung dan menindaklanjuti aspirasi mahasiswa secara responsif</span>
-            </li>
-            <li className="flex gap-3 text-lg text-gray-700 dark:text-gray-300">
-              <span className="text-amber-500 font-bold">2.</span>
-              <span>Melakukan fungsi pengawasan terhadap kinerja BEM dan Ormawa lainnya</span>
-            </li>
-            <li className="flex gap-3 text-lg text-gray-700 dark:text-gray-300">
-              <span className="text-amber-500 font-bold">3.</span>
-              <span>Merancang dan menetapkan peraturan yang mendukung iklim organisasi yang sehat</span>
-            </li>
-            <li className="flex gap-3 text-lg text-gray-700 dark:text-gray-300">
-              <span className="text-amber-500 font-bold">4.</span>
-              <span>Membangun sinergitas dengan seluruh elemen kampus</span>
-            </li>
-          </ul>
-        </motion.div>
+            {/* Mission */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 relative overflow-hidden group hover:border-yellow-500/30 transition-all"
+            >
+                <div className="absolute top-0 left-0 w-2 h-full bg-yellow-500"></div>
+                <div className="flex items-center gap-4 mb-6">
+                    <span className="text-4xl p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl">📜</span>
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Misi Utama</h2>
+                </div>
+                <ul className="space-y-4">
+                    {[
+                        "Menampung dan menindaklanjuti aspirasi mahasiswa secara responsif",
+                        "Melakukan fungsi pengawasan terhadap kinerja BEM dan Ormawa lainnya",
+                        "Merancang peraturan yang mendukung iklim organisasi yang sehat",
+                        "Membangun sinergitas dengan seluruh elemen kampus"
+                    ].map((item, idx) => (
+                        <li key={idx} className="flex gap-4 text-slate-600 dark:text-slate-300 items-start">
+                            <span className="w-6 h-6 flex-shrink-0 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs font-bold mt-1">{idx + 1}</span>
+                            <span className="text-lg leading-relaxed">{item}</span>
+                        </li>
+                    ))}
+                </ul>
+            </motion.div>
+        </div>
 
-        {/* Objectives Section */}
+        {/* Features / Functions */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="glass p-8 rounded-2xl border border-amber-500/30 shadow-xl"
+          transition={{ delay: 0.6, duration: 0.8 }}
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-amber-600 to-yellow-600 flex items-center justify-center">
-              <span className="text-2xl">⚡</span>
+            <h2 className="text-3xl font-bold text-center mb-12 text-slate-800 dark:text-white tracking-tight">Fungsi Strategis</h2>
+            <div className="grid md:grid-cols-4 gap-6">
+                {[
+                    { title: "Legislasi", icon: "📝", desc: "Perancangan Undang-Undang" },
+                    { title: "Aspirasi", icon: "🗣️", desc: "Jembatan Suara Mahasiswa" },
+                    { title: "Pengawasan", icon: "👁️", desc: "Monitoring Kinerja Eksekutif" },
+                    { title: "Budgeting", icon: "💰", desc: "Transparansi Anggaran" }
+                ].map((item, idx) => (
+                    <motion.div 
+                        key={idx}
+                        whileHover={{ y: -10 }}
+                        className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 text-center hover:border-amber-500/50 transition-colors group"
+                    >
+                        <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">{item.title}</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{item.desc}</p>
+                    </motion.div>
+                ))}
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Fungsi Utama</h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6 pl-4 md:pl-16">
-            <div className="p-6 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-800">
-              <h3 className="font-bold text-xl mb-3 text-amber-600 dark:text-amber-400">📝 Legislasi</h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Pembuatan undang-undang dan peraturan untuk ketertiban organisasi.
-              </p>
-            </div>
-            <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800">
-              <h3 className="font-bold text-xl mb-3 text-yellow-600 dark:text-yellow-400">🗣️ Aspirasi</h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Wadah penyampaian kritik dan saran dari mahasiswa untuk kemajuan bersama.
-              </p>
-            </div>
-            <div className="p-6 rounded-xl bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-800">
-              <h3 className="font-bold text-xl mb-3 text-amber-600 dark:text-amber-400">👁️ Pengawasan</h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Memastikan program kerja eksekutif berjalan sesuai dengan rencana.
-              </p>
-            </div>
-            <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800">
-              <h3 className="font-bold text-xl mb-3 text-yellow-600 dark:text-yellow-400">💰 Budgeting</h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Pengawasan dan persetujuan anggaran kegiatan organisasi mahasiswa.
-              </p>
-            </div>
-          </div>
         </motion.div>
       </div>
     </div>
