@@ -15,10 +15,13 @@ const links = [
 ]
 
 const ormawaLinks = [
+  { href: '/ormawa/dpm', label: 'DPM', icon: '🏛️', color: 'from-amber-500 to-yellow-500' },
+  { href: '/ormawa/ldk', label: 'LDK', icon: '🕌', color: 'from-emerald-500 to-green-500' },
   { href: '/ormawa/himsi', label: 'HIMSI', icon: '💻', color: 'from-blue-500 to-cyan-500' },
   { href: '/ormawa/himatif', label: 'HIMATIF', icon: '⚡', color: 'from-green-500 to-teal-500' },
   { href: '/ormawa/himareka', label: 'HIMAREKA', icon: '⚙️', color: 'from-orange-500 to-red-500' },
   { href: '/ormawa/adcom', label: 'ADCOM', icon: '📢', color: 'from-purple-500 to-pink-500' },
+  { href: '/ormawa/icgd', label: 'ICGD', icon: '🎨', color: 'from-cyan-500 to-blue-500' },
   { href: '/ormawa/icrt', label: 'ICRT', icon: '🛡️', color: 'from-blue-700 to-blue-500' },
   { href: '/ormawa/futsal', label: 'Futsal', icon: '⚽', color: 'from-yellow-500 to-amber-500' },
   { href: '/ormawa/gematika', label: 'Gematika', icon: '🏔️', color: 'from-green-700 to-emerald-500' },
