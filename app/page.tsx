@@ -276,7 +276,6 @@ export default function Home() {
         transition={{ duration: 0.8 }}
         className="relative py-20 px-4"
       >
-      >
         <div className="max-w-4xl mx-auto text-center glass-card border border-ocean-200 dark:border-ocean-800 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-ocean-400 to-ocean-600" />
           <motion.div
