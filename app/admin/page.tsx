@@ -47,9 +47,10 @@ export default function AdminDashboard() {
     const stored = localStorage.getItem('kegiatan')
     if (stored) setKegiatan(JSON.parse(stored))
     else {
-      fetch('/data/kegiatan.json')
-        .then(res => res.json())
-        .then(data => setKegiatan(data))
+      // Fallback or empty default
+      const defaultData: Kegiatan[] = [] 
+      setKegiatan(defaultData)
+      // fetch('/data/kegiatan.json').then... (optional implementation)
     }
   }, [])
 
@@ -157,529 +158,498 @@ export default function AdminDashboard() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
         {/* Sidebar */}
         <motion.aside
           initial={{ x: -300 }}
           animate={{ x: 0 }}
-          className="fixed left-0 top-0 h-screen w-64 glass border-r border-orangeBright/30 pt-20 px-4 z-40"
+          className="fixed md:static left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-40 shadow-xl md:shadow-none"
         >
-          <div className="flex flex-col items-center mb-8">
-            <Image src="/images/logo.png" alt="Logo" width={80} height={80} className="rounded-full mb-3" />
-            <h3 className="text-xl font-bold text-orangeBright">Admin Panel</h3>
-            <p className="text-sm text-gray-400">BEM IKMI Cirebon</p>
+          <div className="p-6 flex flex-col items-center border-b border-slate-100 dark:border-slate-800">
+            <div className="w-16 h-16 relative mb-3">
+              <Image src="/images/logo.png" alt="Logo" fill className="object-contain" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white">Admin Panel</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">BEM IKMI Cirebon</p>
           </div>
 
-          <nav className="space-y-2">
-            <button
-              onClick={() => setViewMode('dashboard')}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
-                viewMode === 'dashboard'
-                  ? 'bg-orangeBright text-white shadow-lg'
-                  : 'text-gray-300 hover:bg-white/10'
-              }`}
-            >
-              <span className="text-lg mr-2">📊</span> Dashboard
-            </button>
-            <button
-              onClick={() => setViewMode('kegiatan')}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
-                viewMode === 'kegiatan'
-                  ? 'bg-orangeBright text-white shadow-lg'
-                  : 'text-gray-300 hover:bg-white/10'
-              }`}
-            >
-              <span className="text-lg mr-2">📅</span> Kelola Kegiatan
-            </button>
-            <button
-              onClick={() => setViewMode('layanan')}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
-                viewMode === 'layanan'
-                  ? 'bg-orangeBright text-white shadow-lg'
-                  : 'text-gray-300 hover:bg-white/10'
-              }`}
-            >
-              <span className="text-lg mr-2">📝</span> Data Layanan
-            </button>
-            <button
-              onClick={() => setViewMode('settings')}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
-                viewMode === 'settings'
-                  ? 'bg-orangeBright text-white shadow-lg'
-                  : 'text-gray-300 hover:bg-white/10'
-              }`}
-            >
-              <span className="text-lg mr-2">⚙️</span> Pengaturan
-            </button>
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            {[
+              { id: 'dashboard', icon: '📊', label: 'Dashboard' },
+              { id: 'kegiatan', icon: '📅', label: 'Kelola Kegiatan' },
+              { id: 'layanan', icon: '📝', label: 'Data Layanan' },
+              { id: 'settings', icon: '⚙️', label: 'Pengaturan' },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setViewMode(item.id as ViewMode)}
+                className={`w-full text-left px-4 py-3 rounded-xl transition-all font-medium flex items-center gap-3 ${
+                  viewMode === item.id
+                    ? 'bg-ocean-50 dark:bg-ocean-900/20 text-ocean-600 dark:text-ocean-400'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <span className="text-lg">{item.icon}</span> {item.label}
+              </button>
+            ))}
           </nav>
 
-          <button
-            onClick={handleLogout}
-            className="absolute bottom-8 left-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition font-semibold"
-          >
-            <span className="text-lg mr-2">🚪</span> Logout
-          </button>
+          <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 transition-all font-semibold text-sm"
+            >
+              🚪 Logout
+            </button>
+          </div>
         </motion.aside>
 
         {/* Main Content */}
-        <div className="ml-64 pt-20 px-8 pb-10">
-          <AnimatePresence mode="wait">
-            {/* Dashboard View */}
-            {viewMode === 'dashboard' && (
-              <motion.div
-                key="dashboard"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h1 className="text-4xl font-bold text-orangeBright mb-8">
-                  Dashboard Overview
-                </h1>
+        <main className="flex-1 min-w-0 overflow-y-auto h-screen">
+          <div className="p-8 max-w-7xl mx-auto">
+            <AnimatePresence mode="wait">
+              {/* Dashboard View */}
+              {viewMode === 'dashboard' && (
+                <motion.div
+                  key="dashboard"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <header className="mb-8">
+                    <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Dashboard Overview</h1>
+                    <p className="text-slate-500 dark:text-slate-400">Selamat datang kembali, Administrator.</p>
+                  </header>
 
-                {/* Stats Cards */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="glass p-6 rounded-xl border border-neon shadow-lg"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-400 text-sm mb-1">Total Kegiatan</p>
-                        <h3 className="text-4xl font-bold text-neon">{totalKegiatan}</h3>
-                      </div>
-                      <div className="text-5xl">📚</div>
+                  {/* Stats Cards */}
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <StatCard 
+                      title="Total Kegiatan" 
+                      value={totalKegiatan} 
+                      icon="📚" 
+                      color="bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400" 
+                    />
+                    <StatCard 
+                      title="Bulan Ini" 
+                      value={kegiatanBulanIni} 
+                      icon="📅" 
+                      color="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400" 
+                    />
+                    <StatCard 
+                      title="Mendatang" 
+                      value={kegiatanMendatang} 
+                      icon="🚀" 
+                      color="bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400" 
+                    />
+                    <StatCard 
+                      title="Aspirasi" 
+                      value={layananData.length} 
+                      icon="📝" 
+                      color="bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400" 
+                    />
+                  </div>
+
+                  {/* Recent Activities */}
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-slate-800 dark:text-white">Kegiatan Terbaru</h2>
+                      <button onClick={() => setViewMode('kegiatan')} className="text-sm text-ocean-600 font-medium hover:underline">Lihat Semua</button>
                     </div>
-                  </motion.div>
-
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="glass p-6 rounded-xl border border-orangeBright shadow-lg"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-400 text-sm mb-1">Bulan Ini</p>
-                        <h3 className="text-4xl font-bold text-orangeBright">{kegiatanBulanIni}</h3>
-                      </div>
-                      <div className="text-5xl">📅</div>
+                    <div className="space-y-4">
+                      {kegiatan.length === 0 ? (
+                         <p className="text-slate-500 text-center py-4">Belum ada kegiatan.</p>
+                      ) : (
+                        kegiatan.slice(0, 5).map((k) => (
+                          <div key={k.id} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                            <div className="w-16 h-16 rounded-lg bg-slate-200 dark:bg-slate-800 overflow-hidden flex-shrink-0">
+                                {k.gambar ? (
+                                    <img src={k.gambar} alt={k.judul} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-2xl">📅</div>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-slate-800 dark:text-slate-200 truncate">{k.judul}</h4>
+                              <p className="text-sm text-slate-500 dark:text-slate-400">{k.tanggal}</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  </motion.div>
+                  </div>
+                </motion.div>
+              )}
 
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="glass p-6 rounded-xl border border-green-500 shadow-lg"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-400 text-sm mb-1">Mendatang</p>
-                        <h3 className="text-4xl font-bold text-green-500">{kegiatanMendatang}</h3>
-                      </div>
-                      <div className="text-5xl">🚀</div>
+              {/* Kegiatan Management View */}
+              {viewMode === 'kegiatan' && (
+                <motion.div
+                  key="kegiatan"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Kelola Kegiatan</h1>
+                        <p className="text-slate-500">Manajemen program kerja dan event.</p>
                     </div>
-                  </motion.div>
+                    <button
+                      onClick={() => setShowForm(!showForm)}
+                      className="bg-ocean-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-ocean-700 transition shadow-lg shadow-ocean-500/20 flex items-center gap-2"
+                    >
+                      {showForm ? '❌ Tutup Form' : '➕ Tambah Kegiatan'}
+                    </button>
+                  </div>
 
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="glass p-6 rounded-xl border border-purple-500 shadow-lg"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-400 text-sm mb-1">Aspirasi & Kerjasama</p>
-                        <h3 className="text-4xl font-bold text-purple-500">{layananData.length}</h3>
-                      </div>
-                      <div className="text-5xl">📝</div>
-                    </div>
-                  </motion.div>
-                </div>
+                  {/* Form Tambah / Edit */}
+                  <AnimatePresence>
+                    {showForm && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 mb-10 overflow-hidden shadow-sm"
+                      >
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+                          {editId ? '✏️ Edit Kegiatan' : '➕ Tambah Kegiatan Baru'}
+                        </h2>
 
-                {/* Recent Activities */}
-                <div className="glass p-6 rounded-xl border border-orangeBright/30">
-                  <h2 className="text-2xl font-bold text-orangeBright mb-4">Kegiatan Terbaru</h2>
-                  <div className="space-y-3">
-                    {kegiatan.slice(0, 5).map((k) => (
-                      <div key={k.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition">
-                        {k.gambar && (
-                          <img src={k.gambar} alt={k.judul} className="w-16 h-16 object-cover rounded-lg" />
-                        )}
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-white">{k.judul}</h4>
-                          <p className="text-sm text-gray-400">{k.tanggal}</p>
+                        <div className="grid md:grid-cols-2 gap-8">
+                          <div className="space-y-5">
+                            <div>
+                              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Judul Kegiatan</label>
+                              <input
+                                type="text"
+                                placeholder="Contoh: Seminar Nasional Teknologi"
+                                className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-ocean-500 transition"
+                                value={judul}
+                                onChange={(e) => setJudul(e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Deskripsi</label>
+                              <textarea
+                                className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-ocean-500 transition"
+                                placeholder="Deskripsi lengkap kegiatan..."
+                                rows={4}
+                                value={deskripsi}
+                                onChange={(e) => setDeskripsi(e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Tanggal Pelaksanaan</label>
+                              <input
+                                type="date"
+                                className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-ocean-500 transition"
+                                value={tanggal}
+                                onChange={(e) => setTanggal(e.target.value)}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Upload Gambar */}
+                          <div className="flex flex-col">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Poster / Dokumentasi</label>
+                            <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer relative">
+                              <input type="file" accept="image/*" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                              <div className="text-4xl mb-3 text-slate-400">📸</div>
+                              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Klik atau drag gambar ke sini</p>
+                            </div>
+                            {gambar && (
+                              <motion.div 
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="mt-4 relative h-48 rounded-xl overflow-hidden shadow-md"
+                              >
+                                <img src={gambar} alt="Preview" className="w-full h-full object-cover" />
+                              </motion.div>
+                            )}
+                          </div>
                         </div>
-                      </div>
+
+                        <div className="flex gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                            <button
+                                onClick={editId ? simpanEdit : tambahKegiatan}
+                                className="bg-ocean-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-ocean-700 transition"
+                            >
+                                {editId ? '💾 Simpan Perubahan' : '🚀 Publish'}
+                            </button>
+                            <button
+                                onClick={resetForm}
+                                className="px-6 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                            >
+                                Batal
+                            </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Pencarian */}
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">Daftar Kegiatan</h2>
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                        <input
+                            type="text"
+                            placeholder="Cari kegiatan..."
+                            className="pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500 w-64"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                  </div>
+
+                  {/* Daftar Kegiatan Grid */}
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filtered.map((k, i) => (
+                      <motion.div
+                        key={k.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        whileHover={{ y: -5 }}
+                        className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all group"
+                      >
+                        <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                          {k.gambar ? (
+                            <img
+                              src={k.gambar}
+                              alt={k.judul}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                             <div className="w-full h-full flex items-center justify-center text-4xl text-slate-300">🖼️</div> 
+                          )}
+                          <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-slate-800 dark:text-white shadow-sm">
+                            {k.tanggal}
+                          </div>
+                        </div>
+                        <div className="p-5">
+                          <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 line-clamp-1">{k.judul}</h3>
+                          <p className="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2 h-10">{k.deskripsi}</p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => editKegiatan(k)}
+                              className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => hapusKegiatan(k.id)}
+                              className="flex-1 bg-red-50 dark:bg-red-900/20 text-red-600 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/40 transition"
+                            >
+                              Hapus
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
-              </motion.div>
-            )}
 
-            {/* Kegiatan Management View */}
-            {viewMode === 'kegiatan' && (
-              <motion.div
-                key="kegiatan"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex justify-between items-center mb-8">
-                  <h1 className="text-4xl font-bold text-orangeBright">Kelola Kegiatan</h1>
-                  <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="bg-neon text-black px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition shadow-lg"
-                  >
-                    {showForm ? '❌ Tutup Form' : '➕ Tambah Kegiatan'}
-                  </button>
-                </div>
-
-                {/* Form Tambah / Edit */}
-                <AnimatePresence>
-                  {showForm && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="glass p-8 rounded-xl border border-neon mb-10 overflow-hidden"
-                    >
-                      <h2 className="text-2xl font-semibold text-neon mb-6">
-                        {editId ? '✏️ Edit Kegiatan' : '➕ Tambah Kegiatan Baru'}
-                      </h2>
-
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-300 mb-2">Judul Kegiatan</label>
-                            <input
-                              type="text"
-                              placeholder="Masukkan judul kegiatan..."
-                              className="w-full p-3 rounded-lg bg-black/30 border border-orangeBright text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon transition"
-                              value={judul}
-                              onChange={(e) => setJudul(e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-300 mb-2">Deskripsi</label>
-                            <textarea
-                              className="w-full p-3 rounded-lg bg-black/30 border border-orangeBright text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon transition"
-                              placeholder="Deskripsi kegiatan..."
-                              rows={4}
-                              value={deskripsi}
-                              onChange={(e) => setDeskripsi(e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-300 mb-2">Tanggal</label>
-                            <input
-                              type="date"
-                              className="w-full p-3 rounded-lg bg-black/30 border border-orangeBright text-white focus:outline-none focus:ring-2 focus:ring-neon transition"
-                              value={tanggal}
-                              onChange={(e) => setTanggal(e.target.value)}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Upload Gambar */}
-                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-orangeBright rounded-xl p-6 bg-black/20">
-                          <label className="cursor-pointer text-center">
-                            <div className="text-5xl mb-3">📸</div>
-                            <p className="text-gray-400 mb-2">Klik untuk upload gambar</p>
-                            <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-                          </label>
-                          {gambar && (
-                            <motion.img
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              src={gambar}
-                              alt="Preview"
-                              className="mt-4 w-full h-48 object-cover rounded-lg border-2 border-neon shadow-lg"
-                            />
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 mt-6">
-                        {editId ? (
-                          <>
-                            <button
-                              onClick={simpanEdit}
-                              className="bg-neon text-black px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition shadow-lg"
-                            >
-                              💾 Simpan Perubahan
-                            </button>
-                            <button
-                              onClick={resetForm}
-                              className="border border-orangeBright px-6 py-3 rounded-lg text-orangeBright hover:bg-orangeBright hover:text-white transition"
-                            >
-                              ❌ Batal
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            onClick={tambahKegiatan}
-                            className="bg-orangeBright text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition shadow-lg"
-                          >
-                            ➕ Tambah Kegiatan
-                          </button>
-                        )}
-                      </div>
-                    </motion.div>
+                  {filtered.length === 0 && (
+                    <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                      <div className="text-4xl mb-3">📭</div>
+                      <p className="text-slate-500">Tidak ada kegiatan ditemukan</p>
+                    </div>
                   )}
-                </AnimatePresence>
+                </motion.div>
+              )}
 
-                {/* Pencarian */}
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-semibold text-white">Daftar Kegiatan ({filtered.length})</h2>
-                  <input
-                    type="text"
-                    placeholder="🔍 Cari kegiatan..."
-                    className="p-3 rounded-lg bg-black/30 border border-neon text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neon w-64"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-
-                {/* Daftar Kegiatan */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filtered.map((k, i) => (
-                    <motion.div
-                      key={k.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      whileHover={{ scale: 1.03 }}
-                      className="glass border border-orangeBright/50 rounded-xl overflow-hidden hover:shadow-[0_0_20px_#00ffff] transition-all"
-                    >
-                      {k.gambar && (
-                        <div className="relative h-48 overflow-hidden">
-                          <img
-                            src={k.gambar}
-                            alt={k.judul}
-                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                          />
-                        </div>
-                      )}
-                      <div className="p-4">
-                        <h3 className="text-xl font-bold text-orangeBright mb-2">{k.judul}</h3>
-                        <p className="text-gray-300 text-sm mb-3 line-clamp-2">{k.deskripsi}</p>
-                        <p className="text-sm text-neon mb-4">📅 {k.tanggal}</p>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => editKegiatan(k)}
-                            className="flex-1 bg-neon text-black px-3 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition"
-                          >
-                            ✏️ Edit
-                          </button>
-                          <button
-                            onClick={() => hapusKegiatan(k.id)}
-                            className="flex-1 bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition"
-                          >
-                            🗑️ Hapus
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {filtered.length === 0 && (
-                  <div className="text-center py-20">
-                    <div className="text-6xl mb-4">📭</div>
-                    <p className="text-gray-400 text-lg">Tidak ada kegiatan ditemukan</p>
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {/* Layanan View */}
-            {viewMode === 'layanan' && (
-              <motion.div
-                key="layanan"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h1 className="text-4xl font-bold text-orangeBright mb-8">Data Layanan Mahasiswa</h1>
-                
-                {/* Summary Cards */}
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                  <div className="glass p-6 rounded-xl border border-blue-500/50">
-                    <div className="flex items-center gap-4">
-                      <div className="text-5xl">📝</div>
+              {/* Layanan View */}
+              {viewMode === 'layanan' && (
+                <motion.div
+                  key="layanan"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <header className="mb-8">
+                    <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Data Layanan</h1>
+                    <p className="text-slate-500">Aspirasi mahasiswa dan pengajuan kerjasama.</p>
+                  </header>
+                  
+                  {/* Summary Cards */}
+                  <div className="grid md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-blue-100 dark:border-blue-900/30 shadow-sm flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-3xl text-blue-600">📝</div>
                       <div>
-                        <p className="text-gray-400 text-sm">Total Aspirasi</p>
-                        <h3 className="text-3xl font-bold text-blue-500">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Total Aspirasi</p>
+                        <h3 className="text-3xl font-bold text-slate-800 dark:text-white">
                           {layananData.filter(d => d.type === 'aspirasi').length}
                         </h3>
                       </div>
                     </div>
-                  </div>
-                  <div className="glass p-6 rounded-xl border border-indigo-500/50">
-                    <div className="flex items-center gap-4">
-                      <div className="text-5xl">🤝</div>
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-indigo-100 dark:border-indigo-900/30 shadow-sm flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-3xl text-indigo-600">🤝</div>
                       <div>
-                        <p className="text-gray-400 text-sm">Total Kerjasama</p>
-                        <h3 className="text-3xl font-bold text-indigo-500">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Total Kerjasama</p>
+                        <h3 className="text-3xl font-bold text-slate-800 dark:text-white">
                           {layananData.filter(d => d.type === 'kerjasama').length}
                         </h3>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Data List */}
-                <div className="space-y-4">
-                  {layananData.length === 0 ? (
-                    <div className="text-center py-20 glass rounded-xl border border-gray-700">
-                      <div className="text-6xl mb-4">📭</div>
-                      <p className="text-gray-400 text-lg">Belum ada data layanan</p>
-                    </div>
-                  ) : (
-                    layananData.sort((a, b) => b.id - a.id).map((data, index) => (
-                      <motion.div
-                        key={data.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="glass p-6 rounded-xl border border-gray-700 hover:border-orangeBright transition-all"
-                      >
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  {/* Data List */}
+                  <div className="space-y-4">
+                    {layananData.length === 0 ? (
+                      <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                        <div className="text-4xl mb-4">📭</div>
+                        <p className="text-slate-500">Belum ada data layanan masuk</p>
+                      </div>
+                    ) : (
+                      layananData.sort((a, b) => b.id - a.id).map((data, index) => (
+                        <motion.div
+                          key={data.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all"
+                        >
+                          <div className="flex justify-between items-start mb-4">
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
                               data.type === 'aspirasi' 
-                                ? 'bg-blue-500 text-white' 
-                                : 'bg-indigo-500 text-white'
+                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                                : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'
                             }`}>
-                              {data.type === 'aspirasi' ? '📝 Aspirasi' : '🤝 Kerjasama'}
+                              {data.type}
+                            </span>
+                            <span className="text-xs text-slate-400 font-medium">
+                              {new Date(data.tanggal).toLocaleDateString('id-ID', {
+                                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                              })}
                             </span>
                           </div>
-                          <span className="text-sm text-gray-400">
-                            {new Date(data.tanggal).toLocaleDateString('id-ID', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
-                        </div>
-                        
-                        <h3 className="text-xl font-bold text-white mb-3">{data.nama}</h3>
-                        
-                        {data.type === 'aspirasi' ? (
-                          <div className="grid md:grid-cols-2 gap-4 mb-4 text-sm">
-                            <div className="bg-white/5 p-3 rounded-lg">
-                              <p className="text-gray-400 mb-1">NIM</p>
-                              <p className="text-white font-semibold">{data.nim}</p>
-                            </div>
-                            <div className="bg-white/5 p-3 rounded-lg">
-                              <p className="text-gray-400 mb-1">Kategori</p>
-                              <p className="text-white font-semibold">{data.kategori}</p>
+                          
+                          <div className="mb-4">
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white">{data.nama}</h3>
+                            <p className="text-sm text-slate-500">{data.type === 'aspirasi' ? data.nim : data.organisasi}</p>
+                          </div>
+                          
+                          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 mb-4">
+                            <p className="text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+                              {data.type === 'aspirasi' ? 'Isi Aspirasi' : 'Detail Proposal'}
+                            </p>
+                            <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm">{data.pesan}</p>
+                          </div>
+
+                          <div className="flex justify-between items-center text-xs text-slate-500 mb-4">
+                            <div className="flex gap-4">
+                                <span>📧 {data.email || '-'}</span>
+                                <span>📱 {data.phone || '-'}</span>
+                                {data.kategori && <span>🏷️ {data.kategori}</span>}
                             </div>
                           </div>
-                        ) : (
-                          <div className="grid md:grid-cols-2 gap-4 mb-4 text-sm">
-                            <div className="bg-white/5 p-3 rounded-lg">
-                              <p className="text-gray-400 mb-1">Organisasi</p>
-                              <p className="text-white font-semibold">{data.organisasi}</p>
-                            </div>
-                            <div className="bg-white/5 p-3 rounded-lg">
-                              <p className="text-gray-400 mb-1">Email</p>
-                              <p className="text-white font-semibold">{data.email}</p>
-                            </div>
-                            <div className="bg-white/5 p-3 rounded-lg">
-                              <p className="text-gray-400 mb-1">Telepon</p>
-                              <p className="text-white font-semibold">{data.phone}</p>
-                            </div>
-                            <div className="bg-white/5 p-3 rounded-lg">
-                              <p className="text-gray-400 mb-1">Jenis Kerjasama</p>
-                              <p className="text-white font-semibold">{data.jenisKerjasama}</p>
-                            </div>
+
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                if (confirm('Tandai sebagai selesai?')) {
+                                  const updated = layananData.filter(d => d.id !== data.id)
+                                  setLayananData(updated)
+                                  localStorage.setItem('layananData', JSON.stringify(updated))
+                                }
+                              }}
+                              className="px-4 py-2 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 rounded-lg text-sm font-semibold hover:bg-green-100 dark:hover:bg-green-900/30 transition"
+                            >
+                              ✓ Selesai
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm('Hapus data ini?')) {
+                                  const updated = layananData.filter(d => d.id !== data.id)
+                                  setLayananData(updated)
+                                  localStorage.setItem('layananData', JSON.stringify(updated))
+                                }
+                              }}
+                              className="px-4 py-2 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 rounded-lg text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/30 transition"
+                            >
+                              Hapus
+                            </button>
                           </div>
-                        )}
-                        
-                        <div className="bg-white/5 p-4 rounded-lg">
-                          <p className="text-gray-400 text-sm mb-2">
-                            {data.type === 'aspirasi' ? 'Pesan Aspirasi:' : 'Detail Proposal:'}
-                          </p>
-                          <p className="text-gray-300">{data.pesan}</p>
-                        </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              )}
 
-                        <div className="mt-4 flex gap-2">
-                          <button
-                            onClick={() => {
-                              if (confirm('Tandai sebagai selesai ditindaklanjuti?')) {
-                                const updated = layananData.filter(d => d.id !== data.id)
-                                setLayananData(updated)
-                                localStorage.setItem('layananData', JSON.stringify(updated))
-                              }
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition"
-                          >
-                            ✓ Selesai
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (confirm('Hapus data ini?')) {
-                                const updated = layananData.filter(d => d.id !== data.id)
-                                setLayananData(updated)
-                                localStorage.setItem('layananData', JSON.stringify(updated))
-                              }
-                            }}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition"
-                          >
-                            🗑️ Hapus
-                          </button>
+              {/* Settings View */}
+              {viewMode === 'settings' && (
+                <motion.div
+                  key="settings"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-8">Pengaturan Akun</h1>
+                  <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                        <div className="w-16 h-16 rounded-full bg-ocean-100 dark:bg-ocean-900/30 flex items-center justify-center text-3xl">👤</div>
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-800 dark:text-white">Admin Utama</h2>
+                            <p className="text-slate-500">Super Administrator</p>
                         </div>
-                      </motion.div>
-                    ))
-                  )}
-                </div>
-              </motion.div>
-            )}
+                      </div>
+                      
+                      <div className="grid gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Username</label>
+                          <input
+                            type="text"
+                            value="admin"
+                            disabled
+                            className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Role Access</label>
+                          <input
+                            type="text"
+                            value="Full Access"
+                            disabled
+                            className="w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500"
+                          />
+                        </div>
+                      </div>
 
-            {/* Settings View */}
-            {viewMode === 'settings' && (
-              <motion.div
-                key="settings"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h1 className="text-4xl font-bold text-orangeBright mb-8">Pengaturan</h1>
-                <div className="glass p-8 rounded-xl border border-orangeBright/30">
-                  <h2 className="text-2xl font-semibold text-white mb-4">Informasi Admin</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">Username</label>
-                      <input
-                        type="text"
-                        value="admin"
-                        disabled
-                        className="w-full p-3 rounded-lg bg-black/30 border border-gray-600 text-gray-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">Role</label>
-                      <input
-                        type="text"
-                        value="Administrator"
-                        disabled
-                        className="w-full p-3 rounded-lg bg-black/30 border border-gray-600 text-gray-400"
-                      />
-                    </div>
-                    <div className="pt-4">
-                      <p className="text-gray-400 text-sm">
-                        💡 Untuk mengubah password atau pengaturan lainnya, hubungi developer.
-                      </p>
+                      <div className="pt-4 bg-orange-50 dark:bg-orange-900/10 p-4 rounded-xl border border-orange-100 dark:border-orange-900/20">
+                        <p className="text-orange-800 dark:text-orange-300 text-sm flex gap-2">
+                           💡 <span>Untuk alasan keamanan, perubahan password dan konfigurasi sistem inti hanya dapat dilakukan melalui database atau menghubungi developer.</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </main>
       </div>
     </ProtectedRoute>
   )
+}
+
+// Helper Component for Stats
+function StatCard({ title, value, icon, color }: { title: string, value: number, icon: string, color: string }) {
+    return (
+        <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between"
+        >
+            <div>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</p>
+                <h3 className="text-3xl font-bold text-slate-800 dark:text-white">{value}</h3>
+            </div>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${color}`}>
+                {icon}
+            </div>
+        </motion.div>
+    )
 }
