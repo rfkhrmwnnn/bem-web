@@ -31,10 +31,128 @@ type ViewMode = 'dashboard' | 'kegiatan' | 'layanan' | 'settings'
 
 export default function AdminDashboard() {
   const router = useRouter()
-  // ... existing state ...
-  const [sidebarOpen, setSidebarOpen] = useState(false) // New state for mobile sidebar
+  const [kegiatan, setKegiatan] = useState<Kegiatan[]>([])
+  const [layananData, setLayananData] = useState<LayananData[]>([])
+  const [judul, setJudul] = useState('')
+  const [deskripsi, setDeskripsi] = useState('')
+  const [tanggal, setTanggal] = useState('')
+  const [gambar, setGambar] = useState<string | undefined>(undefined)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [search, setSearch] = useState('')
+  const [viewMode, setViewMode] = useState<ViewMode>('dashboard')
+  const [showForm, setShowForm] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // ... existing functions ...
+  // Load data awal dari localStorage atau file JSON
+  useEffect(() => {
+    const stored = localStorage.getItem('kegiatan')
+    if (stored) setKegiatan(JSON.parse(stored))
+    else {
+      fetch('/data/kegiatan.json')
+        .then(res => res.json())
+        .then(data => setKegiatan(data))
+    }
+  }, [])
+
+  // Simpan otomatis ke localStorage
+  useEffect(() => {
+    localStorage.setItem('kegiatan', JSON.stringify(kegiatan))
+  }, [kegiatan])
+
+  // Load layanan data
+  useEffect(() => {
+    const stored = localStorage.getItem('layananData')
+    if (stored) setLayananData(JSON.parse(stored))
+
+    const handleStorage = () => {
+      const data = localStorage.getItem('layananData')
+      if (data) setLayananData(JSON.parse(data))
+    }
+
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
+  const resetForm = () => {
+    setJudul('')
+    setDeskripsi('')
+    setTanggal('')
+    setGambar(undefined)
+    setEditId(null)
+    setShowForm(false)
+  }
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const url = URL.createObjectURL(file)
+      setGambar(url)
+    }
+  }
+
+  const tambahKegiatan = () => {
+    if (!judul || !deskripsi || !tanggal)
+      return alert('Lengkapi semua data!')
+    const newItem: Kegiatan = {
+      id: Date.now(),
+      judul,
+      deskripsi,
+      tanggal,
+      gambar: gambar || '/images/logo.png',
+    }
+    const updated = [...kegiatan, newItem]
+    setKegiatan(updated)
+    localStorage.setItem('kegiatan', JSON.stringify(updated))
+    window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
+    resetForm()
+  }
+
+  const hapusKegiatan = (id: number) => {
+    if (confirm('Yakin ingin menghapus kegiatan ini?')) {
+      const updated = kegiatan.filter(k => k.id !== id)
+      setKegiatan(updated)
+      localStorage.setItem('kegiatan', JSON.stringify(updated))
+      window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
+    }
+  }
+
+  const editKegiatan = (item: Kegiatan) => {
+    setEditId(item.id)
+    setJudul(item.judul)
+    setDeskripsi(item.deskripsi)
+    setTanggal(item.tanggal)
+    setGambar(item.gambar || undefined)
+    setShowForm(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const simpanEdit = () => {
+    if (!editId) return
+    const updated = kegiatan.map(k =>
+      k.id === editId ? { ...k, judul, deskripsi, tanggal, gambar: gambar || undefined } : k
+    )
+    setKegiatan(updated)
+    localStorage.setItem('kegiatan', JSON.stringify(updated))
+    window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
+    resetForm()
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn')
+    router.push('/login')
+  }
+
+  const filtered = kegiatan.filter(k =>
+    k.judul.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const totalKegiatan = kegiatan.length
+  const kegiatanBulanIni = kegiatan.filter(k => {
+    const date = new Date(k.tanggal)
+    const now = new Date()
+    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+  }).length
+  const kegiatanMendatang = kegiatan.filter(k => new Date(k.tanggal) > new Date()).length
 
   return (
     <ProtectedRoute>
