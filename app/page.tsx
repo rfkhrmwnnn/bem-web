@@ -22,8 +22,8 @@ export default function Home() {
       step++
       setStats({
         mahasiswa: Math.floor((1200 / steps) * step),
-        kegiatan: Math.floor((30 / steps) * step),
-        kementerian: Math.floor((8 / steps) * step),
+        kegiatan: Math.floor((14 / steps) * step),
+        kementerian: Math.floor((7 / steps) * step),
       })
       if (step >= steps) clearInterval(timer)
     }, interval)
@@ -196,7 +196,7 @@ export default function Home() {
             <div className="text-4xl font-bold bg-gradient-to-r from-ocean-500 to-sky-400 bg-clip-text text-transparent mb-2">
               {stats.kegiatan}+
             </div>
-            <div className="text-slate-600 dark:text-slate-400 font-medium">Kegiatan Tahunan</div>
+            <div className="text-slate-600 dark:text-slate-400 font-medium">Program Kerja</div>
           </motion.div>
 
           <motion.div
