@@ -27,7 +27,7 @@ export default function ThemeToggle() {
         onHoverEnd={() => setShowTooltip(false)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="relative bg-gradient-to-r from-orangeBright to-neon p-4 rounded-full shadow-2xl hover:shadow-orangeBright/50 transition-all group"
+        className="relative bg-gradient-to-r from-ocean-600 to-ocean-400 p-4 rounded-full shadow-2xl hover:shadow-ocean-500/50 transition-all group"
       >
         <motion.div
           initial={false}
@@ -54,7 +54,7 @@ export default function ThemeToggle() {
         </AnimatePresence>
 
         {/* Glow effect */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orangeBright to-neon opacity-0 group-hover:opacity-50 blur-xl transition-opacity" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-ocean-600 to-ocean-400 opacity-0 group-hover:opacity-50 blur-xl transition-opacity" />
       </motion.button>
     </div>
   )
