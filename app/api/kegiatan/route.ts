@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
 import { join } from 'path'
 import { isAllowedImageFile, isAllowedImageBuffer, ALLOWED_IMAGE_ERROR } from '@/lib/imageValidation'
+import { isAdminRequest } from '@/lib/auth'
 
 const DATA_PATH = join(process.cwd(), 'data', 'kegiatan.json')
 const UPLOAD_DIR = join(process.cwd(), 'public', 'images', 'kegiatan')
@@ -24,6 +25,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  if (!isAdminRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const formData = await request.formData()
     const judul = formData.get('judul') as string

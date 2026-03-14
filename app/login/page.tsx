@@ -11,20 +11,30 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
-    setTimeout(() => {
-      if (username === 'admin' && password === 'parta2025') {
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
+
+      if (res.ok) {
         localStorage.setItem('isLoggedIn', 'true')
         router.push('/admin')
       } else {
-        setError('Username atau password salah')
+        const data = await res.json()
+        setError(data.error || 'Username atau password salah')
         setLoading(false)
       }
-    }, 800)
+    } catch {
+      setError('Terjadi kesalahan. Coba lagi.')
+      setLoading(false)
+    }
   }
 
   return (

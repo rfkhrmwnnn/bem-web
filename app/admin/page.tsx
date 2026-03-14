@@ -156,7 +156,8 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' })
     localStorage.removeItem('isLoggedIn')
     router.push('/login')
   }
