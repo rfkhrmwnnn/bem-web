@@ -5,14 +5,14 @@ import Image from 'next/image'
 const strukturKabinet = [
   { jabatan: 'Presiden Mahasiswa', nama: 'Moh Ari Widoyono', foto: '/images/presma.png' },
   { jabatan: 'Wakil Presiden Mahasiswa', nama: 'Muhammad Zamil Farhan', foto: '/images/wapresma.png' },
-  { jabatan: 'Sekretaris Jenderal', nama: 'Liva', foto: '/images/sekjen.jpg' },
-  { jabatan: 'Kementerian Keuangan', nama: 'Imelda', foto: '/images/kemenkeu.jpg' },
+  { jabatan: 'Sekretaris Jenderal', nama: 'Kukun', foto: '/images/sekjen.jpg' },
+  { jabatan: 'Kementerian Keuangan', nama: 'Shafa', foto: '/images/kemenkeu.jpg' },
   { jabatan: 'Kementerian PSDM', nama: 'Ramdan', foto: '/images/psdm.jpg' },
   { jabatan: 'Kementerian Dalam Negeri', nama: 'Irul', foto: '/images/dagri.jpg' },
   { jabatan: 'Kementerian Luar Negeri', nama: 'Ruli', foto: '/images/menlu.jpg' },
   { jabatan: 'Kementerian Kominfo', nama: 'Rafi', foto: '/images/kominfo.jpg' },
   { jabatan: 'Kementerian Ristek', nama: 'Rifki', foto: '/images/ristek.jpg' },
-  { jabatan: 'Kementerian Agama', nama: 'Riza', foto: '/images/kemenag.jpg' },
+  { jabatan: 'Kementerian Agama', nama: 'Luqman', foto: '/images/kemenag.jpg' },
 ]
 
 const containerVariants = {
