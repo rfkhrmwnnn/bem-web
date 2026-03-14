@@ -1,11 +1,17 @@
-export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/pjpeg', 'image/png', 'image/webp']
 export const ALLOWED_IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'webp']
 export const ALLOWED_IMAGE_ERROR = 'Format gambar tidak didukung. Gunakan JPG, JPEG, PNG, atau WebP.'
 
 /** Validates file extension and MIME type */
 export function isAllowedImageFile(file: File): boolean {
   const ext = (file.name.split('.').pop() || '').toLowerCase()
-  return ALLOWED_IMAGE_TYPES.includes(file.type) && ALLOWED_IMAGE_EXTS.includes(ext)
+  const hasAllowedExt = ALLOWED_IMAGE_EXTS.includes(ext)
+  const mime = file.type.toLowerCase()
+
+  // Some clients send empty MIME for multipart files.
+  if (!mime) return hasAllowedExt
+
+  return hasAllowedExt && ALLOWED_IMAGE_TYPES.includes(mime)
 }
 
 // Magic bytes for supported image types
