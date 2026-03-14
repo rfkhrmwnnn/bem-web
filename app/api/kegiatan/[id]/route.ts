@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
+import { isAllowedImageFile, isAllowedImageBuffer, ALLOWED_IMAGE_ERROR } from '@/lib/imageValidation'
 
 const DATA_PATH = join(process.cwd(), 'data', 'kegiatan.json')
 const UPLOAD_DIR = join(process.cwd(), 'public', 'images', 'kegiatan')
@@ -47,16 +48,23 @@ export async function PUT(
     let gambarPath = data[idx].gambar
 
     if (gambarFile && gambarFile.size > 0) {
+      if (!isAllowedImageFile(gambarFile)) {
+        return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
+      }
+      const bytes = await gambarFile.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      if (!isAllowedImageBuffer(buffer)) {
+        return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
+      }
       // Remove old uploaded image if it exists
       deleteUploadedImage(data[idx].gambar)
 
       if (!existsSync(UPLOAD_DIR)) {
         mkdirSync(UPLOAD_DIR, { recursive: true })
       }
-      const ext = gambarFile.name.split('.').pop() || 'jpg'
+      const ext = (gambarFile.name.split('.').pop() || 'jpg').toLowerCase()
       const fileName = `${Date.now()}.${ext}`
-      const bytes = await gambarFile.arrayBuffer()
-      writeFileSync(join(UPLOAD_DIR, fileName), Buffer.from(bytes))
+      writeFileSync(join(UPLOAD_DIR, fileName), buffer)
       gambarPath = `/images/kegiatan/${fileName}`
     }
 
