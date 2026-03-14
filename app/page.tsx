@@ -16,17 +16,29 @@ export default function Home() {
     const duration = 2000
     const steps = 60
     const interval = duration / steps
+    let timer: ReturnType<typeof setInterval>
 
-    let step = 0
-    const timer = setInterval(() => {
-      step++
-      setStats({
-        mahasiswa: Math.floor((1200 / steps) * step),
-        kegiatan: Math.floor((14 / steps) * step),
-        kementerian: Math.floor((7 / steps) * step),
+    function startAnimation(totalKegiatan: number) {
+      let step = 0
+      timer = setInterval(() => {
+        step++
+        setStats({
+          mahasiswa: Math.floor((1200 / steps) * step),
+          kegiatan: Math.floor((totalKegiatan / steps) * step),
+          kementerian: Math.floor((7 / steps) * step),
+        })
+        if (step >= steps) clearInterval(timer)
+      }, interval)
+    }
+
+    fetch('/api/kegiatan')
+      .then(res => res.json())
+      .then((data: unknown[]) => {
+        startAnimation(Array.isArray(data) ? data.length : 0)
       })
-      if (step >= steps) clearInterval(timer)
-    }, interval)
+      .catch(() => {
+        startAnimation(0)
+      })
 
     return () => clearInterval(timer)
   }, [])

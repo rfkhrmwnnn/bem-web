@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { isAllowedImageFile, isAllowedImageBuffer, ALLOWED_IMAGE_ERROR } from '@/lib/imageValidation'
+import { isAdminRequest } from '@/lib/auth'
 
 const DATA_PATH = join(process.cwd(), 'data', 'kegiatan.json')
 const UPLOAD_DIR = join(process.cwd(), 'public', 'images', 'kegiatan')
@@ -31,6 +32,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  if (!isAdminRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const id = Number(params.id)
     const formData = await request.formData()
@@ -82,6 +87,10 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  if (!isAdminRequest(_request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const id = Number(params.id)
     const data = readData()
