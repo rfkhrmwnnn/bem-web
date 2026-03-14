@@ -119,6 +119,7 @@ export default function AdminDashboard() {
       const res = await fetch(`/api/kegiatan/${id}`, { method: 'DELETE' })
       if (res.ok) {
         setKegiatan(prev => prev.filter(k => k.id !== id))
+        if (editId === id) resetForm()
       } else {
         alert('Gagal menghapus kegiatan.')
       }
@@ -138,6 +139,8 @@ export default function AdminDashboard() {
 
   const simpanEdit = async () => {
     if (!editId) return
+    if (!judul || !deskripsi || !tanggal)
+      return alert('Lengkapi semua data!')
     const fd = new FormData()
     fd.append('judul', judul)
     fd.append('deskripsi', deskripsi)
@@ -342,7 +345,7 @@ export default function AdminDashboard() {
                         <p className="text-slate-500">Manajemen program kerja dan event.</p>
                     </div>
                     <button
-                      onClick={() => setShowForm(!showForm)}
+                      onClick={() => showForm ? resetForm() : setShowForm(true)}
                       className="bg-ocean-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-ocean-700 transition shadow-lg shadow-ocean-500/20 flex items-center gap-2"
                     >
                       {showForm ? '❌ Tutup Form' : '➕ Tambah Kegiatan'}
