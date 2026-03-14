@@ -134,9 +134,12 @@ export default function Layanan() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center mb-12"
+        className="text-center mb-10 md:mb-12"
       >
-        <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-orangeBright to-neon bg-clip-text text-transparent">
+        <div className="inline-flex items-center gap-2 bg-ocean-50 dark:bg-ocean-900/30 border border-ocean-200 dark:border-ocean-800 rounded-full px-4 py-1.5 text-ocean-600 dark:text-ocean-400 text-sm font-medium mb-4">
+          🤝 Layanan Mahasiswa
+        </div>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-ocean-700 to-ocean-500 dark:from-ocean-300 dark:to-ocean-500 bg-clip-text text-transparent">
           Layanan BEM IKMI
         </h1>
         <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
@@ -153,7 +156,7 @@ export default function Layanan() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.5 }}
             whileHover={{ scale: 1.03, y: -5 }}
-            className="glass p-6 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-orangeBright dark:hover:border-neon transition-all shadow-lg hover:shadow-2xl backdrop-blur-xl group cursor-pointer"
+            className="glass-card border border-ocean-100 dark:border-ocean-800 hover:border-ocean-300 dark:hover:border-ocean-600 transition-all group cursor-pointer p-6"
             onClick={() => {
               if (layanan.action) {
                 layanan.action()
@@ -165,13 +168,13 @@ export default function Layanan() {
             <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${layanan.color} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
               {layanan.icon}
             </div>
-            <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white group-hover:text-orangeBright dark:group-hover:text-neon transition-colors">
+            <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white group-hover:text-ocean-600 dark:group-hover:text-ocean-400 transition-colors">
               {layanan.title}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               {layanan.description}
             </p>
-            <div className="flex items-center text-orangeBright dark:text-neon font-semibold text-sm group-hover:translate-x-2 transition-transform">
+            <div className="flex items-center text-ocean-600 dark:text-ocean-400 font-semibold text-sm group-hover:translate-x-2 transition-transform">
               {layanan.action ? 'Buka Form' : 'Akses Layanan'} →
             </div>
           </motion.div>
@@ -201,7 +204,7 @@ export default function Layanan() {
             >
               <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
                 {/* Form Header */}
-                <div className="sticky top-0 bg-gradient-to-r from-orangeBright to-neon p-6 rounded-t-3xl">
+                <div className="sticky top-0 bg-gradient-to-r from-ocean-600 to-ocean-500 p-6 rounded-t-3xl">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="text-4xl">📝</div>
@@ -256,7 +259,7 @@ export default function Layanan() {
                             value={nama}
                             onChange={(e) => setNama(e.target.value)}
                             placeholder="Masukkan nama lengkap Anda"
-                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                             required
                           />
                         </div>
@@ -270,7 +273,7 @@ export default function Layanan() {
                             value={nim}
                             onChange={(e) => setNim(e.target.value)}
                             placeholder="Masukkan NIM Anda"
-                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                             required
                           />
                         </div>
@@ -282,7 +285,7 @@ export default function Layanan() {
                           <select
                             value={kategori}
                             onChange={(e) => setKategori(e.target.value)}
-                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                             required
                           >
                             <option value="">Pilih kategori...</option>
@@ -306,7 +309,7 @@ export default function Layanan() {
                             value={nama}
                             onChange={(e) => setNama(e.target.value)}
                             placeholder="Masukkan nama lengkap Anda"
-                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                             required
                           />
                         </div>
@@ -320,7 +323,7 @@ export default function Layanan() {
                             value={organisasi}
                             onChange={(e) => setOrganisasi(e.target.value)}
                             placeholder="Masukkan nama organisasi/perusahaan"
-                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                             required
                           />
                         </div>
@@ -335,7 +338,7 @@ export default function Layanan() {
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                               placeholder="email@example.com"
-                              className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                              className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                               required
                             />
                           </div>
@@ -349,7 +352,7 @@ export default function Layanan() {
                               value={phone}
                               onChange={(e) => setPhone(e.target.value)}
                               placeholder="08xxxxxxxxxx"
-                              className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                              className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                               required
                             />
                           </div>
@@ -362,7 +365,7 @@ export default function Layanan() {
                           <select
                             value={jenisKerjasama}
                             onChange={(e) => setJenisKerjasama(e.target.value)}
-                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition"
+                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition"
                             required
                           >
                             <option value="">Pilih jenis kerjasama...</option>
@@ -386,7 +389,7 @@ export default function Layanan() {
                           ? 'Sampaikan aspirasi, kritik, atau saran Anda...'
                           : 'Jelaskan detail proposal kerjasama atau sponsorship Anda...'}
                         rows={6}
-                        className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orangeBright dark:focus:ring-neon transition resize-none"
+                        className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:focus:ring-ocean-400 transition resize-none"
                         required
                       />
                     </div>
@@ -406,7 +409,7 @@ export default function Layanan() {
                         type="submit"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="flex-1 bg-gradient-to-r from-orangeBright to-neon text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                        className="flex-1 bg-gradient-to-r from-ocean-600 to-ocean-500 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
                       >
                         📤 Kirim {showForm === 'aspirasi' ? 'Aspirasi' : 'Proposal'}
                       </motion.button>
@@ -433,7 +436,7 @@ export default function Layanan() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.6 }}
-        className="glass p-8 rounded-2xl border border-orangeBright/30 dark:border-neon/30 shadow-xl backdrop-blur-xl"
+        className="glass p-8 rounded-2xl border border-ocean-200 dark:border-ocean-800 shadow-xl backdrop-blur-xl"
       >
         <div className="flex items-start gap-4">
           <div className="text-4xl">ℹ️</div>
@@ -443,19 +446,19 @@ export default function Layanan() {
             </h3>
             <ul className="space-y-2 text-gray-600 dark:text-gray-400">
               <li className="flex items-start gap-2">
-                <span className="text-orangeBright dark:text-neon mt-1">•</span>
+                <span className="text-ocean-600 dark:text-ocean-400 mt-1">•</span>
                 <span>Semua layanan dapat diakses oleh seluruh mahasiswa STMIK IKMI Cirebon</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orangeBright dark:text-neon mt-1">•</span>
+                <span className="text-ocean-600 dark:text-ocean-400 mt-1">•</span>
                 <span>Aspirasi akan ditinjau dalam waktu maksimal 3x24 jam</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orangeBright dark:text-neon mt-1">•</span>
+                <span className="text-ocean-600 dark:text-ocean-400 mt-1">•</span>
                 <span>Untuk pertanyaan lebih lanjut, hubungi kami melalui halaman Hubungi</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orangeBright dark:text-neon mt-1">•</span>
+                <span className="text-ocean-600 dark:text-ocean-400 mt-1">•</span>
                 <span>Identitas pelapor akan dijaga kerahasiaannya</span>
               </li>
             </ul>

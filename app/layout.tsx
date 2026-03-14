@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-white dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-500">
         <Navbar />
         <ThemeToggle />
-        <main className="pt-24 px-6 max-w-6xl mx-auto">{children}</main>
+        <main className="pt-20 sm:pt-24 px-4 sm:px-6 max-w-7xl mx-auto">{children}</main>
         <Footer />
       </body>
     </html>
