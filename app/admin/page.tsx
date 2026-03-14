@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Image from 'next/image'
+import { ALLOWED_IMAGE_TYPES, ALLOWED_IMAGE_EXTS, ALLOWED_IMAGE_ERROR } from '@/lib/imageValidation'
 
 interface Kegiatan {
   id: number
@@ -82,6 +83,12 @@ export default function AdminDashboard() {
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      const ext = file.name.split('.').pop()?.toLowerCase() || ''
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type) || !ALLOWED_IMAGE_EXTS.includes(ext)) {
+        alert(ALLOWED_IMAGE_ERROR)
+        e.target.value = ''
+        return
+      }
       setGambarFile(file)
       const reader = new FileReader()
       reader.onload = (ev) => setGambar(ev.target?.result as string)
@@ -392,9 +399,10 @@ export default function AdminDashboard() {
                           <div className="flex flex-col">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Poster / Dokumentasi</label>
                             <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer relative">
-                              <input type="file" accept="image/*" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                              <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                               <div className="text-4xl mb-3 text-slate-400">📸</div>
                               <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Klik atau drag gambar ke sini</p>
+                              <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">JPG, JPEG, PNG</p>
                             </div>
                             {gambar && (
                               <motion.div 
