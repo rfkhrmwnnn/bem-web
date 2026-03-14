@@ -19,6 +19,11 @@ const ormawaLinks = [
   { href: '/ormawa/himatif', label: 'HIMATIF' },
   { href: '/ormawa/himareka', label: 'HIMAREKA' },
   { href: '/ormawa/adcom', label: 'ADCOM' },
+  { href: '/ormawa/icgd', label: 'ICGD' },
+  { href: '/ormawa/icrt', label: 'ICRT' },
+  { href: '/ormawa/futsal', label: 'Futsal' },
+  { href: '/ormawa/gematika', label: 'Gematika' },
+  { href: '/ormawa/senaya', label: 'Senaya' },
 ]
 
 export default function Footer() {
