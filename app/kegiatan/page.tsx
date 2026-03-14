@@ -14,23 +14,10 @@ export default function KegiatanPage() {
   const [kegiatan, setKegiatan] = useState<Kegiatan[]>([])
 
   useEffect(() => {
-    const stored = localStorage.getItem('kegiatan')
-    if (stored) {
-      setKegiatan(JSON.parse(stored))
-    } else {
-      fetch('/data/kegiatan.json')
-        .then(res => res.json())
-        .then(data => setKegiatan(data))
-    }
-
-    const updateHandler = (e: any) => {
-      if (e.key === 'kegiatan') {
-        const data = JSON.parse(e.newValue || '[]')
-        setKegiatan(data)
-      }
-    }
-    window.addEventListener('storage', updateHandler)
-    return () => window.removeEventListener('storage', updateHandler)
+    fetch('/api/kegiatan')
+      .then(res => res.json())
+      .then(data => setKegiatan(data))
+      .catch(err => console.error('Failed to load kegiatan:', err))
   }, [])
 
   return (

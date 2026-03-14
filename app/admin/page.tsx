@@ -37,27 +37,23 @@ export default function AdminDashboard() {
   const [deskripsi, setDeskripsi] = useState('')
   const [tanggal, setTanggal] = useState('')
   const [gambar, setGambar] = useState<string | undefined>(undefined)
+  const [gambarFile, setGambarFile] = useState<File | null>(null)
   const [editId, setEditId] = useState<number | null>(null)
   const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard')
   const [showForm, setShowForm] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Load data awal dari localStorage atau file JSON
-  useEffect(() => {
-    const stored = localStorage.getItem('kegiatan')
-    if (stored) setKegiatan(JSON.parse(stored))
-    else {
-      fetch('/data/kegiatan.json')
-        .then(res => res.json())
-        .then(data => setKegiatan(data))
-    }
-  }, [])
+  // Load kegiatan from server API
+  const loadKegiatan = () => {
+    fetch('/api/kegiatan')
+      .then(res => res.json())
+      .then(data => setKegiatan(data))
+  }
 
-  // Simpan otomatis ke localStorage
   useEffect(() => {
-    localStorage.setItem('kegiatan', JSON.stringify(kegiatan))
-  }, [kegiatan])
+    loadKegiatan()
+  }, [])
 
   // Load layanan data
   useEffect(() => {
@@ -78,6 +74,7 @@ export default function AdminDashboard() {
     setDeskripsi('')
     setTanggal('')
     setGambar(undefined)
+    setGambarFile(null)
     setEditId(null)
     setShowForm(false)
   }
@@ -85,34 +82,39 @@ export default function AdminDashboard() {
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const url = URL.createObjectURL(file)
-      setGambar(url)
+      setGambarFile(file)
+      const reader = new FileReader()
+      reader.onload = (ev) => setGambar(ev.target?.result as string)
+      reader.readAsDataURL(file)
     }
   }
 
-  const tambahKegiatan = () => {
+  const tambahKegiatan = async () => {
     if (!judul || !deskripsi || !tanggal)
       return alert('Lengkapi semua data!')
-    const newItem: Kegiatan = {
-      id: Date.now(),
-      judul,
-      deskripsi,
-      tanggal,
-      gambar: gambar || '/images/logo.png',
+    const fd = new FormData()
+    fd.append('judul', judul)
+    fd.append('deskripsi', deskripsi)
+    fd.append('tanggal', tanggal)
+    if (gambarFile) fd.append('gambar', gambarFile)
+    const res = await fetch('/api/kegiatan', { method: 'POST', body: fd })
+    if (res.ok) {
+      const newItem: Kegiatan = await res.json()
+      setKegiatan(prev => [...prev, newItem])
+      resetForm()
+    } else {
+      alert('Gagal menyimpan kegiatan.')
     }
-    const updated = [...kegiatan, newItem]
-    setKegiatan(updated)
-    localStorage.setItem('kegiatan', JSON.stringify(updated))
-    window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
-    resetForm()
   }
 
-  const hapusKegiatan = (id: number) => {
+  const hapusKegiatan = async (id: number) => {
     if (confirm('Yakin ingin menghapus kegiatan ini?')) {
-      const updated = kegiatan.filter(k => k.id !== id)
-      setKegiatan(updated)
-      localStorage.setItem('kegiatan', JSON.stringify(updated))
-      window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
+      const res = await fetch(`/api/kegiatan/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setKegiatan(prev => prev.filter(k => k.id !== id))
+      } else {
+        alert('Gagal menghapus kegiatan.')
+      }
     }
   }
 
@@ -122,19 +124,26 @@ export default function AdminDashboard() {
     setDeskripsi(item.deskripsi)
     setTanggal(item.tanggal)
     setGambar(item.gambar || undefined)
+    setGambarFile(null)
     setShowForm(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const simpanEdit = () => {
+  const simpanEdit = async () => {
     if (!editId) return
-    const updated = kegiatan.map(k =>
-      k.id === editId ? { ...k, judul, deskripsi, tanggal, gambar: gambar || undefined } : k
-    )
-    setKegiatan(updated)
-    localStorage.setItem('kegiatan', JSON.stringify(updated))
-    window.dispatchEvent(new StorageEvent('storage', { key: 'kegiatan', newValue: JSON.stringify(updated) }))
-    resetForm()
+    const fd = new FormData()
+    fd.append('judul', judul)
+    fd.append('deskripsi', deskripsi)
+    fd.append('tanggal', tanggal)
+    if (gambarFile) fd.append('gambar', gambarFile)
+    const res = await fetch(`/api/kegiatan/${editId}`, { method: 'PUT', body: fd })
+    if (res.ok) {
+      const updated: Kegiatan = await res.json()
+      setKegiatan(prev => prev.map(k => k.id === editId ? updated : k))
+      resetForm()
+    } else {
+      alert('Gagal memperbarui kegiatan.')
+    }
   }
 
   const handleLogout = () => {
