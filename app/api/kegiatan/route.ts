@@ -24,6 +24,21 @@ export async function GET() {
   return NextResponse.json(data)
 }
 
+async function saveImageFile(file: File): Promise<string> {
+  const bytes = await file.arrayBuffer()
+  const buffer = Buffer.from(bytes)
+  if (!isAllowedImageBuffer(buffer)) {
+    throw new Error(ALLOWED_IMAGE_ERROR)
+  }
+  if (!existsSync(UPLOAD_DIR)) {
+    mkdirSync(UPLOAD_DIR, { recursive: true })
+  }
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+  const fileName = `${crypto.randomUUID()}.${ext}`
+  writeFileSync(join(UPLOAD_DIR, fileName), buffer)
+  return `/images/kegiatan/${fileName}`
+}
+
 export async function POST(request: NextRequest) {
   if (!isAdminRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -35,6 +50,7 @@ export async function POST(request: NextRequest) {
     const deskripsi = formData.get('deskripsi') as string
     const tanggal = formData.get('tanggal') as string
     const gambarFile = formData.get('gambar') as File | null
+    const dokumentasiFiles = formData.getAll('dokumentasi') as File[]
 
     if (!judul || !deskripsi || !tanggal) {
       return NextResponse.json({ error: 'Lengkapi semua data!' }, { status: 400 })
@@ -46,18 +62,18 @@ export async function POST(request: NextRequest) {
       if (!isAllowedImageFile(gambarFile)) {
         return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
       }
-      const bytes = await gambarFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      if (!isAllowedImageBuffer(buffer)) {
-        return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
+      gambarPath = await saveImageFile(gambarFile)
+    }
+
+    const dokumentasiPaths: string[] = []
+    for (const file of dokumentasiFiles) {
+      if (file && file.size > 0) {
+        if (!isAllowedImageFile(file)) {
+          return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
+        }
+        const path = await saveImageFile(file)
+        dokumentasiPaths.push(path)
       }
-      if (!existsSync(UPLOAD_DIR)) {
-        mkdirSync(UPLOAD_DIR, { recursive: true })
-      }
-      const ext = (gambarFile.name.split('.').pop() || 'jpg').toLowerCase()
-      const fileName = `${Date.now()}.${ext}`
-      writeFileSync(join(UPLOAD_DIR, fileName), buffer)
-      gambarPath = `/images/kegiatan/${fileName}`
     }
 
     const data = readData()
@@ -68,6 +84,7 @@ export async function POST(request: NextRequest) {
       deskripsi,
       tanggal,
       gambar: gambarPath,
+      dokumentasi: dokumentasiPaths,
     }
     data.push(newItem)
     writeData(data)
