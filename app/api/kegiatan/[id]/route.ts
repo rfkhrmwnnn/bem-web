@@ -72,6 +72,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Kegiatan tidak ditemukan.' }, { status: 404 })
     }
 
+    if (!judul || !deskripsi || !tanggal) {
+      return NextResponse.json({ error: 'Lengkapi semua data!' }, { status: 400 })
+    }
+
     let gambarPath = data[idx].gambar
 
     if (gambarFile && gambarFile.size > 0) {
@@ -106,6 +110,9 @@ export async function PUT(
     return NextResponse.json(data[idx])
   } catch (err) {
     console.error('PUT /api/kegiatan/[id] error:', err)
+    if (err instanceof Error && err.message === ALLOWED_IMAGE_ERROR) {
+      return NextResponse.json({ error: err.message }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Gagal memperbarui kegiatan.' }, { status: 500 })
   }
 }

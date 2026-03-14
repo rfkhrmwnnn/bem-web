@@ -155,7 +155,8 @@ export default function AdminDashboard() {
       setKegiatan(prev => [...prev, newItem])
       resetForm()
     } else {
-      alert('Gagal menyimpan kegiatan.')
+      const errData = await res.json().catch(() => null)
+      alert(errData?.error || 'Gagal menyimpan kegiatan.')
     }
   }
 
@@ -203,7 +204,8 @@ export default function AdminDashboard() {
       setKegiatan(prev => prev.map(k => k.id === editId ? updated : k))
       resetForm()
     } else {
-      alert('Gagal memperbarui kegiatan.')
+      const errData = await res.json().catch(() => null)
+      alert(errData?.error || 'Gagal memperbarui kegiatan.')
     }
   }
 
@@ -454,10 +456,10 @@ export default function AdminDashboard() {
                           <div className="flex flex-col">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Poster / Gambar Utama</label>
                             <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer relative">
-                              <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                              <input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                               <div className="text-4xl mb-3 text-slate-400">📸</div>
                               <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Klik atau drag gambar ke sini</p>
-                              <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">JPG, JPEG, PNG</p>
+                              <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">JPG, JPEG, PNG, WebP</p>
                             </div>
                             {gambar && (
                               <motion.div 
@@ -479,14 +481,14 @@ export default function AdminDashboard() {
                           <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer relative">
                             <input
                               type="file"
-                              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                               multiple
                               onChange={handleDokumentasiUpload}
                               className="absolute inset-0 opacity-0 cursor-pointer"
                             />
                             <div className="text-4xl mb-3 text-slate-400">🖼️</div>
                             <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Klik atau drag foto dokumentasi ke sini</p>
-                            <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">JPG, JPEG, PNG — pilih beberapa file sekaligus</p>
+                            <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">JPG, JPEG, PNG, WebP — pilih beberapa file sekaligus</p>
                           </div>
 
                           {/* Existing dokumentasi (edit mode) */}

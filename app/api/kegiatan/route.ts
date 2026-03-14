@@ -92,6 +92,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(newItem, { status: 201 })
   } catch (err) {
     console.error('POST /api/kegiatan error:', err)
+    if (err instanceof Error && err.message === ALLOWED_IMAGE_ERROR) {
+      return NextResponse.json({ error: err.message }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Gagal menyimpan kegiatan.' }, { status: 500 })
   }
 }
