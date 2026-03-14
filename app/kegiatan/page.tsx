@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Kegiatan {
   id: number
@@ -8,10 +8,12 @@ interface Kegiatan {
   deskripsi: string
   tanggal: string
   gambar?: string
+  dokumentasi?: string[]
 }
 
 export default function KegiatanPage() {
   const [kegiatan, setKegiatan] = useState<Kegiatan[]>([])
+  const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null)
 
   useEffect(() => {
     fetch('/api/kegiatan')
@@ -19,6 +21,22 @@ export default function KegiatanPage() {
       .then(data => setKegiatan(data))
       .catch(err => console.error('Failed to load kegiatan:', err))
   }, [])
+
+  const openLightbox = (images: string[], index: number) => setLightbox({ images, index })
+  const closeLightbox = () => setLightbox(null)
+  const prevImage = () => setLightbox(prev => prev ? { ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length } : null)
+  const nextImage = () => setLightbox(prev => prev ? { ...prev, index: (prev.index + 1) % prev.images.length } : null)
+
+  useEffect(() => {
+    if (!lightbox) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prevImage()
+      else if (e.key === 'ArrowRight') nextImage()
+      else if (e.key === 'Escape') closeLightbox()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [lightbox])
 
   return (
     <motion.section
@@ -82,10 +100,87 @@ export default function KegiatanPage() {
                 <span>📅</span>
                 <span>{item.tanggal}</span>
               </div>
+
+              {/* Dokumentasi Gallery */}
+              {item.dokumentasi && item.dokumentasi.length > 0 && (
+                <div className="mt-4 border-t border-ocean-50 dark:border-ocean-900 pt-4">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-1">
+                    📷 Dokumentasi <span className="font-normal">({item.dokumentasi.length} foto)</span>
+                  </p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {item.dokumentasi.slice(0, 6).map((src, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => openLightbox(item.dokumentasi!, idx)}
+                        className="relative h-20 rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-ocean-500"
+                      >
+                        <img src={src} alt={`dokumentasi-${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                        {idx === 5 && item.dokumentasi!.length > 6 && (
+                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-sm font-bold">
+                            +{item.dokumentasi!.length - 6}
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
       )}
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightbox && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+            onClick={closeLightbox}
+          >
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); prevImage() }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold transition z-10"
+              aria-label="Foto sebelumnya"
+            >
+              ‹
+            </button>
+            <motion.img
+              key={lightbox.index}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              src={lightbox.images[lightbox.index]}
+              alt={`dokumentasi-${lightbox.index + 1}`}
+              className="max-h-[85vh] max-w-full rounded-xl shadow-2xl object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); nextImage() }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold transition z-10"
+              aria-label="Foto berikutnya"
+            >
+              ›
+            </button>
+            <button
+              type="button"
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold transition"
+              aria-label="Tutup"
+            >
+              ✕
+            </button>
+            <div className="absolute bottom-4 text-white/60 text-sm">
+              {lightbox.index + 1} / {lightbox.images.length}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.section>
   )
 }

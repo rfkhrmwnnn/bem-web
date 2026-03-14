@@ -12,6 +12,7 @@ interface Kegiatan {
   deskripsi: string
   tanggal: string
   gambar?: string
+  dokumentasi?: string[]
 }
 
 interface LayananData {
@@ -39,6 +40,10 @@ export default function AdminDashboard() {
   const [tanggal, setTanggal] = useState('')
   const [gambar, setGambar] = useState<string | undefined>(undefined)
   const [gambarFile, setGambarFile] = useState<File | null>(null)
+  const [dokumentasiFiles, setDokumentasiFiles] = useState<File[]>([])
+  const [dokumentasiPreviews, setDokumentasiPreviews] = useState<string[]>([])
+  const [existingDokumentasi, setExistingDokumentasi] = useState<string[]>([])
+  const [removeDokumentasi, setRemoveDokumentasi] = useState<string[]>([])
   const [editId, setEditId] = useState<number | null>(null)
   const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard')
@@ -76,6 +81,10 @@ export default function AdminDashboard() {
     setTanggal('')
     setGambar(undefined)
     setGambarFile(null)
+    setDokumentasiFiles([])
+    setDokumentasiPreviews([])
+    setExistingDokumentasi([])
+    setRemoveDokumentasi([])
     setEditId(null)
     setShowForm(false)
   }
@@ -96,6 +105,41 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleDokumentasiUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    const valid: File[] = []
+    for (const file of files) {
+      const ext = file.name.split('.').pop()?.toLowerCase() || ''
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type) || !ALLOWED_IMAGE_EXTS.includes(ext)) {
+        alert(ALLOWED_IMAGE_ERROR)
+        continue
+      }
+      valid.push(file)
+    }
+    if (valid.length === 0) {
+      e.target.value = ''
+      return
+    }
+    setDokumentasiFiles(prev => [...prev, ...valid])
+    valid.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = (ev) => setDokumentasiPreviews(prev => [...prev, ev.target?.result as string])
+      reader.readAsDataURL(file)
+    })
+    e.target.value = ''
+  }
+
+  const removeNewDokumentasi = (index: number) => {
+    setDokumentasiFiles(prev => prev.filter((_, i) => i !== index))
+    setDokumentasiPreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const toggleRemoveExistingDokumentasi = (path: string) => {
+    setRemoveDokumentasi(prev =>
+      prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]
+    )
+  }
+
   const tambahKegiatan = async () => {
     if (!judul || !deskripsi || !tanggal)
       return alert('Lengkapi semua data!')
@@ -104,6 +148,7 @@ export default function AdminDashboard() {
     fd.append('deskripsi', deskripsi)
     fd.append('tanggal', tanggal)
     if (gambarFile) fd.append('gambar', gambarFile)
+    for (const file of dokumentasiFiles) fd.append('dokumentasi', file)
     const res = await fetch('/api/kegiatan', { method: 'POST', body: fd })
     if (res.ok) {
       const newItem: Kegiatan = await res.json()
@@ -133,6 +178,10 @@ export default function AdminDashboard() {
     setTanggal(item.tanggal)
     setGambar(item.gambar || undefined)
     setGambarFile(null)
+    setExistingDokumentasi(item.dokumentasi || [])
+    setDokumentasiFiles([])
+    setDokumentasiPreviews([])
+    setRemoveDokumentasi([])
     setShowForm(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -146,6 +195,8 @@ export default function AdminDashboard() {
     fd.append('deskripsi', deskripsi)
     fd.append('tanggal', tanggal)
     if (gambarFile) fd.append('gambar', gambarFile)
+    for (const file of dokumentasiFiles) fd.append('dokumentasi', file)
+    for (const path of removeDokumentasi) fd.append('removeDokumentasi', path)
     const res = await fetch(`/api/kegiatan/${editId}`, { method: 'PUT', body: fd })
     if (res.ok) {
       const updated: Kegiatan = await res.json()
@@ -401,7 +452,7 @@ export default function AdminDashboard() {
 
                           {/* Upload Gambar */}
                           <div className="flex flex-col">
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Poster / Dokumentasi</label>
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Poster / Gambar Utama</label>
                             <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer relative">
                               <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                               <div className="text-4xl mb-3 text-slate-400">📸</div>
@@ -418,6 +469,72 @@ export default function AdminDashboard() {
                               </motion.div>
                             )}
                           </div>
+                        </div>
+
+                        {/* Upload Dokumentasi */}
+                        <div className="mt-6">
+                          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                            📷 Dokumentasi Kegiatan <span className="text-slate-400 font-normal">(bisa lebih dari satu foto)</span>
+                          </label>
+                          <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer relative">
+                            <input
+                              type="file"
+                              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                              multiple
+                              onChange={handleDokumentasiUpload}
+                              className="absolute inset-0 opacity-0 cursor-pointer"
+                            />
+                            <div className="text-4xl mb-3 text-slate-400">🖼️</div>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Klik atau drag foto dokumentasi ke sini</p>
+                            <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">JPG, JPEG, PNG — pilih beberapa file sekaligus</p>
+                          </div>
+
+                          {/* Existing dokumentasi (edit mode) */}
+                          {existingDokumentasi.length > 0 && (
+                            <div className="mt-4">
+                              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">Foto Tersimpan</p>
+                              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                {existingDokumentasi.map((src) => (
+                                  <div key={src} className="relative group">
+                                    <img src={src} alt="dokumentasi" className={`w-full h-24 object-cover rounded-lg border-2 transition ${removeDokumentasi.includes(src) ? 'opacity-30 border-red-400' : 'border-slate-200 dark:border-slate-700'}`} />
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleRemoveExistingDokumentasi(src)}
+                                      className={`absolute top-1 right-1 rounded-full w-6 h-6 text-xs font-bold flex items-center justify-center shadow transition ${removeDokumentasi.includes(src) ? 'bg-red-500 text-white' : 'bg-white/80 text-red-500 hover:bg-red-500 hover:text-white'}`}
+                                    >
+                                      ✕
+                                    </button>
+                                    {removeDokumentasi.includes(src) && (
+                                      <div className="absolute inset-0 flex items-center justify-center rounded-lg">
+                                        <span className="text-xs text-red-600 font-bold bg-white/80 px-1 rounded">Akan dihapus</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* New dokumentasi previews */}
+                          {dokumentasiPreviews.length > 0 && (
+                            <div className="mt-4">
+                              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">Foto Baru</p>
+                              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                {dokumentasiPreviews.map((src, i) => (
+                                  <div key={i} className="relative group">
+                                    <img src={src} alt={`preview-${i}`} className="w-full h-24 object-cover rounded-lg border-2 border-ocean-300 dark:border-ocean-600" />
+                                    <button
+                                      type="button"
+                                      onClick={() => removeNewDokumentasi(i)}
+                                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold flex items-center justify-center shadow hover:bg-red-600 transition"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">

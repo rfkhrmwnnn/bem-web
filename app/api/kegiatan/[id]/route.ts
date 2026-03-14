@@ -28,6 +28,26 @@ function deleteUploadedImage(gambarPath: string | undefined) {
   }
 }
 
+function deleteUploadedImages(paths: string[] | undefined) {
+  if (!paths) return
+  for (const p of paths) deleteUploadedImage(p)
+}
+
+async function saveImageFile(file: File): Promise<string> {
+  const bytes = await file.arrayBuffer()
+  const buffer = Buffer.from(bytes)
+  if (!isAllowedImageBuffer(buffer)) {
+    throw new Error(ALLOWED_IMAGE_ERROR)
+  }
+  if (!existsSync(UPLOAD_DIR)) {
+    mkdirSync(UPLOAD_DIR, { recursive: true })
+  }
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+  const fileName = `${crypto.randomUUID()}.${ext}`
+  writeFileSync(join(UPLOAD_DIR, fileName), buffer)
+  return `/images/kegiatan/${fileName}`
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -43,6 +63,8 @@ export async function PUT(
     const deskripsi = formData.get('deskripsi') as string
     const tanggal = formData.get('tanggal') as string
     const gambarFile = formData.get('gambar') as File | null
+    const dokumentasiFiles = formData.getAll('dokumentasi') as File[]
+    const removeDokumentasi = formData.getAll('removeDokumentasi') as string[]
 
     const data = readData()
     const idx = data.findIndex(k => k.id === id)
@@ -56,24 +78,29 @@ export async function PUT(
       if (!isAllowedImageFile(gambarFile)) {
         return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
       }
-      const bytes = await gambarFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      if (!isAllowedImageBuffer(buffer)) {
-        return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
-      }
+      const newPath = await saveImageFile(gambarFile)
       // Remove old uploaded image if it exists
       deleteUploadedImage(data[idx].gambar)
-
-      if (!existsSync(UPLOAD_DIR)) {
-        mkdirSync(UPLOAD_DIR, { recursive: true })
-      }
-      const ext = (gambarFile.name.split('.').pop() || 'jpg').toLowerCase()
-      const fileName = `${Date.now()}.${ext}`
-      writeFileSync(join(UPLOAD_DIR, fileName), buffer)
-      gambarPath = `/images/kegiatan/${fileName}`
+      gambarPath = newPath
     }
 
-    data[idx] = { ...data[idx], judul, deskripsi, tanggal, gambar: gambarPath }
+    // Handle documentation: remove flagged ones, keep the rest, add new ones
+    let currentDokumentasi: string[] = data[idx].dokumentasi || []
+    if (removeDokumentasi.length > 0) {
+      for (const p of removeDokumentasi) deleteUploadedImage(p)
+      currentDokumentasi = currentDokumentasi.filter(p => !removeDokumentasi.includes(p))
+    }
+    for (const file of dokumentasiFiles) {
+      if (file && file.size > 0) {
+        if (!isAllowedImageFile(file)) {
+          return NextResponse.json({ error: ALLOWED_IMAGE_ERROR }, { status: 400 })
+        }
+        const path = await saveImageFile(file)
+        currentDokumentasi.push(path)
+      }
+    }
+
+    data[idx] = { ...data[idx], judul, deskripsi, tanggal, gambar: gambarPath, dokumentasi: currentDokumentasi }
     writeData(data)
 
     return NextResponse.json(data[idx])
@@ -100,6 +127,7 @@ export async function DELETE(
     }
 
     deleteUploadedImage(data[idx].gambar)
+    deleteUploadedImages(data[idx].dokumentasi)
 
     const updated = data.filter(k => k.id !== id)
     writeData(updated)
